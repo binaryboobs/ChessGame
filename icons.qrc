@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/bb.svg</file>
+        <file>icons/bw.svg</file>
+        <file>icons/kb.svg</file>
+        <file>icons/kw.svg</file>
+        <file>icons/nb.svg</file>
+        <file>icons/nw.svg</file>
+        <file>icons/pb.svg</file>
+        <file>icons/pw.svg</file>
+        <file>icons/qb.svg</file>
+        <file>icons/qw.svg</file>
+        <file>icons/rb.svg</file>
+        <file>icons/rw.svg</file>
+        <file>icons/select.svg</file>
+        <file>icons/select_light.svg</file>
+    </qresource>
+</RCC>
