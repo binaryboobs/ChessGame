@@ -13,8 +13,7 @@ public:
 
     static QPoint rookPlace;
 
-    static QPoint blackEnPassantPos;
-    static QPoint whiteEnPassantPos;
+    static QPoint EnPassantPos;
 
     static void initializeEmptyUnitsField();
     static void setUnits();

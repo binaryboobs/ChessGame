@@ -21,3 +21,9 @@ QVector <QVector <QPoint>> Horse:: moves()
     }
     return moves;
 }
+
+void Horse::move(QPoint cell)
+{
+    Pawn::clearEnPassantPos();
+    Unit::move(cell);
+}

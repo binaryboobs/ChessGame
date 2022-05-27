@@ -12,7 +12,6 @@ CONFIG += c++11
 SOURCES += \
     bishop.cpp \
     chess.cpp \
-    gamerules.cpp \
     horse.cpp \
     king.cpp \
     main.cpp \
@@ -26,7 +25,6 @@ SOURCES += \
 
 HEADERS += \
     chess.h \
-    gamerules.h \
     paintboard.h \
     unit.h \
     unitsinfo.h \

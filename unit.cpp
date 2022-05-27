@@ -1,5 +1,5 @@
 #include "unitsinfo.h"
-#include "gamerules.h"
+#include "utils.h"
 
 void Unit::construct(int x, int y, bool isBlack)
 {
@@ -21,7 +21,7 @@ int Unit::getY()
 
 bool Unit::isMoveOfTheUnit(QRect &cell)
 {
-    QVector<QVector<QRect>> moves = GameRules::validMove(this->moves());
+    QVector<QVector<QRect>> moves = Utils::validMove(this->moves());
 
     for (int i = 0; i < moves.size(); i++)
         for (int j = 0; j < moves[i].size(); j++)
@@ -33,10 +33,13 @@ bool Unit::isMoveOfTheUnit(QRect &cell)
 
 void Unit::move(QPoint cell)
 {
+    if (UnitsInfo::unitsAtField[cell.x()][cell.y()]!= nullptr)
+        delete UnitsInfo::unitsAtField[cell.x()][cell.y()];
+
     this->unmoved = false;
     UnitsInfo::unitsAtField[cell.x()][cell.y()] = this;
-    int x = this->x;
-    int y = this->y;
+    int x = this->getX();
+    int y = this->getY();
     this->x = cell.x();
     this->y = cell.y();
     UnitsInfo::unitsAtField[x][y] = nullptr;
@@ -50,6 +53,7 @@ QVector <QVector <QPoint>> Unit::  moves()
 Unit::~Unit()
 {
     this->icon.~QIcon();
+    this->moves().~QVector();
 }
 
 

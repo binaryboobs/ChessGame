@@ -1,6 +1,5 @@
-#include "unitsinfo.h"
 #include "chess.h"
-#include "gamerules.h"
+#include "utils.h"
 
 King::King(int xPos, int yPos, bool isBlack)
 {
@@ -40,11 +39,11 @@ void King::move(QPoint cell)
 
 void King::goRooking()
 {
-    if (Chess::mouseY == int(this->y) - 2)
+    if (Chess::mouseY == this->getY() - 2)
     {
         UnitsInfo::unitsAtField[Chess::currentUnit->x][0]->move(UnitsInfo::rookPlace);
     }
-    if (Chess::mouseY == int(this->y) + 2)
+    if (Chess::mouseY == this->getY() + 2)
     {
         UnitsInfo::unitsAtField[Chess::currentUnit->x][7]->move(UnitsInfo::rookPlace);
     }
@@ -58,34 +57,14 @@ QVector <QPoint> King::findRookingSpots()
 
     if(this->unmoved)
     {
-        if(kingY == 3)
+        for(int i = 0, addPoint = -2, rookGo = -1;           i < 8;          i+=7, addPoint *= -1, rookGo *= -1)
         {
-            if(UnitsInfo::unitsAtField[kingX][kingY - 1] == nullptr)
-                if(UnitsInfo::unitsAtField[kingX][kingY - 2] == nullptr)
-                    if(UnitsInfo::unitsAtField[kingX][kingY - 3] != nullptr && UnitsInfo::unitsAtField[kingX][kingY - 3]->unmoved)
-                        rookingSteps.push_back(QPoint(kingX,kingY - 2)), UnitsInfo::rookPlace.setX(kingX), UnitsInfo::rookPlace.setY(kingY - 1);
-
-            if(UnitsInfo::unitsAtField[kingX][kingY + 1] == nullptr)
-                if(UnitsInfo::unitsAtField[kingX][kingY + 2] == nullptr)
-                    if(UnitsInfo::unitsAtField[kingX][kingY + 3] == nullptr)
-                        if (UnitsInfo::unitsAtField[kingX][kingY + 4] != nullptr && UnitsInfo::unitsAtField[kingX][kingY + 4]->unmoved)
-                            rookingSteps.push_back(QPoint(kingX,kingY + 2)), UnitsInfo::rookPlace.setX(kingX), UnitsInfo::rookPlace.setY(kingY + 1);
-
+            if(UnitsInfo::unitsAtField[kingX][i] != nullptr)
+                if(UnitsInfo::unitsAtField[kingX][i]->unmoved)
+                    if(Utils::isClearArea(UnitsInfo::unitsAtField[kingX][i], this))
+                        rookingSteps.push_back(QPoint(kingX,kingY + addPoint)), UnitsInfo::rookPlace.setX(kingX), UnitsInfo::rookPlace.setY(kingY + rookGo);
         }
-        if(kingY == 4)
-        {
-            if(UnitsInfo::unitsAtField[kingX][kingY + 1] == nullptr)
-                if(UnitsInfo::unitsAtField[kingX][kingY + 2] == nullptr)
-                    if(UnitsInfo::unitsAtField[kingX][kingY + 3] != nullptr && UnitsInfo::unitsAtField[kingX][kingY + 3]->unmoved)
-                        rookingSteps.push_back(QPoint(kingX,kingY + 2)), UnitsInfo::rookPlace.setX(kingX), UnitsInfo::rookPlace.setY(kingY + 1);
 
-            if(UnitsInfo::unitsAtField[kingX][kingY - 1] == nullptr)
-                if(UnitsInfo::unitsAtField[kingX][kingY - 2] == nullptr)
-                    if(UnitsInfo::unitsAtField[kingX][kingY - 3] == nullptr)
-                        if (UnitsInfo::unitsAtField[kingX][kingY - 4] != nullptr && UnitsInfo::unitsAtField[kingX][kingY - 4]->unmoved)
-                            rookingSteps.push_back(QPoint(kingX,kingY - 2)), UnitsInfo::rookPlace.setX(kingX), UnitsInfo::rookPlace.setY(kingY - 1);
-
-        }
     }
 
     return rookingSteps;

@@ -1,7 +1,7 @@
 #ifndef CHESS_H
 #define CHESS_H
 
-#include "unit.h"
+#include "unitsinfo.h"
 #include <QPainter>
 #include <QWidget>
 #include <QPushButton>
@@ -16,14 +16,17 @@ public:
     ~Chess();
 
     static Unit* currentUnit;
-
+    static Unit *getNewUnit();
     static bool whosTurn;
+    static Chess *thatOne;
+    static int x;
+    static int y;
     static int mouseX;
     static int mouseY;
-
 protected:
     void paintEvent(QPaintEvent *e) override;
     void mousePressEvent(QMouseEvent *e) override;
+
 
 };
 #endif // CHESS_H

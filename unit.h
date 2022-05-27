@@ -63,12 +63,12 @@ class Horse : public Unit
 public:
     Horse(int xPos, int yPos, bool isBlack);
     QVector <QVector <QPoint>> moves() override;
+    void move(QPoint cell) override;
 };
 
 class Pawn : public Unit
 {
 public:
-
     Pawn(int xPos, int yPos, bool isBlack);
     QVector <QVector <QPoint>> moves() override;
     void move(QPoint cell) override;
@@ -77,6 +77,12 @@ public:
     void setEnPassantPos();
     void doEnPassant();
     void includeEnPassantPos(QVector<QVector<QPoint>> &moves);
+    static void clearEnPassantPos();
+    bool isPromotePos();
+    static QPair <QRect, QIcon> promoteTo[4];
+    void promote();
+    static bool promotionAvailable;
+    static Unit* forPromotion;
 };
 
 #endif // UNIT_H

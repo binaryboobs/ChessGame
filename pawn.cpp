@@ -1,6 +1,11 @@
-#include "unitsinfo.h"
 #include "chess.h"
-
+#include "paintboard.h"
+#include "utils.h"
+#include <QDebug>
+#include <QPair>
+QPair <QRect, QIcon> Pawn::promoteTo[4];
+bool Pawn::promotionAvailable = false;
+Unit* Pawn::forPromotion = nullptr;
 Pawn::Pawn(int xPos, int yPos, bool isBlack)
 {
     construct(xPos, yPos, isBlack);
@@ -9,15 +14,42 @@ Pawn::Pawn(int xPos, int yPos, bool isBlack)
     this->direction = isBlack ? -1 : 1;
 }
 
+void Pawn::clearEnPassantPos()
+{
+    UnitsInfo::EnPassantPos = QPoint(-1,-1);
+}
+
+bool Pawn::isPromotePos()
+{
+    if(this->colorBlack && this->getX() == 7)
+        return true;
+    if(!this->colorBlack && this->getX() == 0)
+        return true;
+    return false;
+}
+
+void Pawn::promote()
+{
+
+}
+
 void Pawn::move(QPoint cell)
 {
     if (isEnPassantMove())
-    {
         setEnPassantPos();
-    }
+
     doEnPassant();
 
+    if(!this->unmoved)
+        clearEnPassantPos();
+
     Unit::move(cell);
+
+    if(isPromotePos())
+    {
+        forPromotion = UnitsInfo::unitsAtField[this->getX()][this->getY()];
+        promotionAvailable = true;
+    }
 }
 
 bool Pawn::isEnPassantMove()
@@ -27,42 +59,29 @@ bool Pawn::isEnPassantMove()
 
 void Pawn::setEnPassantPos()
 {
-    if(this->colorBlack)
-        UnitsInfo::blackEnPassantPos.setX(this->getX() - this->direction), UnitsInfo::blackEnPassantPos.setY(this->getY());
-    if(!this->colorBlack)
-        UnitsInfo::whiteEnPassantPos.setX(this->getX() - this->direction), UnitsInfo::whiteEnPassantPos.setY(this->getY());
+    UnitsInfo::EnPassantPos = QPoint(this->getX() - this->direction, this->getY());
 }
 
 void Pawn::doEnPassant()
 {
-    if(this->colorBlack)
-        if(QPoint(Chess::mouseX, Chess::mouseY) == UnitsInfo::whiteEnPassantPos)
-            if(UnitsInfo::unitsAtField[UnitsInfo::whiteEnPassantPos.x() + this->direction][UnitsInfo::whiteEnPassantPos.y()] != nullptr)
-                UnitsInfo::unitsAtField[UnitsInfo::whiteEnPassantPos.x() + this->direction][UnitsInfo::whiteEnPassantPos.y()] = nullptr;
+    QPoint mousePos(Chess::mouseX, Chess::mouseY);
 
-    if(!this->colorBlack)
-        if(QPoint(Chess::mouseX, Chess::mouseY) == UnitsInfo::blackEnPassantPos)
-            if(UnitsInfo::unitsAtField[UnitsInfo::blackEnPassantPos.x() + this->direction][UnitsInfo::blackEnPassantPos.y()] != nullptr)
-                UnitsInfo::unitsAtField[UnitsInfo::blackEnPassantPos.x() + this->direction][UnitsInfo::blackEnPassantPos.y()] = nullptr;
+    if(mousePos == UnitsInfo::EnPassantPos)
+        if(UnitsInfo::unitsAtField[UnitsInfo::EnPassantPos.x() + this->direction][UnitsInfo::EnPassantPos.y()] != nullptr)
+        {
+            UnitsInfo::unitsAtField[UnitsInfo::EnPassantPos.x() + this->direction][UnitsInfo::EnPassantPos.y()]->~Unit();
+            UnitsInfo::unitsAtField[UnitsInfo::EnPassantPos.x() + this->direction][UnitsInfo::EnPassantPos.y()] = nullptr;
+        }
 }
 
 void Pawn::includeEnPassantPos(QVector<QVector<QPoint>> &moves)
 {
-    QPoint possibleEnPassant(this->getX() + direction, this->getY() - 1);
-    if(possibleEnPassant == UnitsInfo::whiteEnPassantPos && this->colorBlack)
-        moves.push_back({{possibleEnPassant}});
+    int x = this->getX();
+    int y = this->getY();
 
-    possibleEnPassant = QPoint(this->getX() + direction, this->getY() + 1);
-    if(possibleEnPassant == UnitsInfo::whiteEnPassantPos && this->colorBlack)
-        moves.push_back({{possibleEnPassant}});
-
-    possibleEnPassant = QPoint(this->getX() + direction, this->getY() - 1);
-    if(possibleEnPassant == UnitsInfo::blackEnPassantPos && !this->colorBlack)
-        moves.push_back({{possibleEnPassant}});
-
-    possibleEnPassant = QPoint(this->getX() + direction, this->getY() + 1);
-    if(possibleEnPassant == UnitsInfo::blackEnPassantPos && !this->colorBlack)
-        moves.push_back({{possibleEnPassant}});
+    for(int i = x - this->direction,   j = y - 1;  j <= y + 1;   j += 2)
+        if(QPoint(i,j) == UnitsInfo::EnPassantPos)
+            moves.push_back({QPoint(i,j)});
 }
 
 QVector <QVector <QPoint>> Pawn::  moves()
@@ -77,26 +96,16 @@ QVector <QVector <QPoint>> Pawn::  moves()
 
     includeEnPassantPos(moves);
 
-    if((x + direction >=0 && x + direction < 8) && (y-1 >= 0 && y-1 < 8))
+    if(this->getX() >=1 && this->getX() < 7)
     {
-        if(UnitsInfo::unitsAtField[x + direction][y-1] != nullptr && UnitsInfo::unitsAtField[x + direction][y-1]->colorBlack != Chess::whosTurn)
+        for (int i = this->getX() + direction, j = std::abs(this->getY() - 1); j <= this->getY()+1 ; j+=2)
         {
-            currentMove.push_back(QPoint(x + direction, y-1));
-            moves.push_back(currentMove);
-            currentMove.clear();
+            if(j == 8)
+                break;
+            if(UnitsInfo::unitsAtField[i][j] != nullptr && UnitsInfo::unitsAtField[i][j]->colorBlack != this->colorBlack)
+                moves.push_back({QPoint(i,j)});
         }
     }
-
-
-    if((x + direction >=0 && x + direction < 8) && (y-1 >= 0 && y+1 < 8))
-    {
-        if(UnitsInfo::unitsAtField[x + direction][y+1] != nullptr && UnitsInfo::unitsAtField[x + direction][y+1]->colorBlack != Chess::whosTurn)
-        {
-            currentMove.push_back(QPoint(x + direction, y+1));
-            moves.push_back(currentMove);
-            currentMove.clear();
-        }}
-
 
     while (counter  >  0)
     {

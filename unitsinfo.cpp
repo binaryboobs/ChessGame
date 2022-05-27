@@ -5,13 +5,11 @@ Unit* UnitsInfo::whiteKing;
 
 QPoint UnitsInfo::rookPlace;
 
-QPoint UnitsInfo::blackEnPassantPos;
-QPoint UnitsInfo::whiteEnPassantPos;
+QPoint UnitsInfo::EnPassantPos;
 
 QVector <QVector<Unit*>> UnitsInfo::unitsAtField = {};
 QVector <QVector<Unit*>> UnitsInfo::BlackUnits = {};
 QVector <QVector<Unit*>> UnitsInfo::WhiteUnits = {};
-
 
 void UnitsInfo::initializeEmptyUnitsField()
 {
